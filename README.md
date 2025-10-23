@@ -74,8 +74,8 @@ pip install -r requirements.txt
 
 | Country | Link |
 |---------|------|
-| Romania | [Download here](https://mega.nz/folder/PXJk0D6b#meh5DzMKnyZZ2mOGTowPcA) |
-| Czech Republic | [Download here](https://mega.nz/folder/iXZ3VbiS#HrMOT2L9utVFcq5K-Z1aHw) |
+| Romania | [Download here](https://data.d4science.org/ctlg/ResourceCatalogue/bark_beetle_outbreak_timeseries_romania) |
+| Czech Republic | [Download here](https://data.d4science.org/ctlg/ResourceCatalogue/bark_beetle_outbreak_timeseries_czech_republic) |
 
 Download and place the files in the directory specified in the configs.
 
