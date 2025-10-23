@@ -5,6 +5,10 @@
 [![PyTorch](https://img.shields.io/badge/PyTorch-2.5.1-ee4c2c.svg)](https://pytorch.org/)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 
+## Architecture Overview
+
+![Architecture Diagram](ULISSE.png)
+
 ## Abstract
 
 This project presents an advanced system for automatic forest damage detection using multi-temporal Sentinel-2 satellite imagery. The framework implements a modified U-Net architecture with a pre-trained ResNet encoder, enhanced by Parameter-Efficient Fine-Tuning (PEFT) techniques such as LoRA, DoRA, and HRA to optimize learning with limited computational resources.
