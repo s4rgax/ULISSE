@@ -31,6 +31,7 @@ This project leverages:
 - Python 3.10
 - CUDA 12.4+ (for NVIDIA GPUs)
 - 16GB RAM minimum (32GB recommended)
+- NVIDIA GPU with at least 24GB of vRAM (64GB recommended)
 - 50GB available disk space
 
 ## Installation
@@ -59,12 +60,23 @@ pip install -r requirements.txt
 
 ### 4. Download Dataset and Pre-trained Models
 
-Pre-trained models are available at the following link:
-```
-[DRIVE LINK TO BE INSERTED]
-```
+#### Pre-trained Models
 
-Download and place the files in the `data/models/` directory.
+| Resource | Link |
+|----------|------|
+| Pre-trained Models | [Download here](https://mega.nz/folder/uHwCkYpI#g_PKdl6-apTKhtvTeQOUKg) |
+
+#### Datasets
+
+| Country | Link |
+|---------|------|
+| Romania | [Download here](https://mega.nz/folder/PXJk0D6b#meh5DzMKnyZZ2mOGTowPcA) |
+| Czech Republic | [Download here](https://mega.nz/folder/iXZ3VbiS#HrMOT2L9utVFcq5K-Z1aHw) |
+
+Download and place the files in the directory specified in the configs.
+
+
+Download and place the files in the directory specified in the configs.
 
 ## Project Structure
 
