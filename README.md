@@ -74,8 +74,8 @@ pip install -r requirements.txt
 
 | Country | Link |
 |---------|------|
-| Romania | [Download here](https://data.d4science.org/ctlg/ResourceCatalogue/bark_beetle_outbreak_timeseries_romania) |
-| Czech Republic | [Download here](https://data.d4science.org/ctlg/ResourceCatalogue/bark_beetle_outbreak_timeseries_czech_republic) |
+| Romania | [Download here](https://mega.nz/folder/PXJk0D6b#meh5DzMKnyZZ2mOGTowPcA) |
+| Czech Republic | [Download here](https://mega.nz/folder/iXZ3VbiS#HrMOT2L9utVFcq5K-Z1aHw) |
 
 Download and place the files in the directory specified in the configs.
 
@@ -389,7 +389,7 @@ If you use this code, please cite:
   title={ULISSE: Parameter-Efficient Adaptation of Earth Vision Models to Monitor Forest Disturbance in Sentinel-2 Timeseries},
   author={...},
   journal={...},
-  year={2025}
+  year={2026}
 }
 ```
 

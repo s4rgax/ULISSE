@@ -9,7 +9,7 @@ import os
 
 
 class Sentinel2Dataset:
-    def __init__(self, tile_size=224, phase='train', img_transform=None, mask_transform=None, enable_augmentation=False, add_forest_type=False, **kwargs):
+    def __init__(self, tile_size=224, phase='train', img_transform=None, mask_transform=None, enable_augmentation=False, add_forest_type=False, fill_gap=False, **kwargs):
         self.tile_size = tile_size
         self.phase = phase
         self.img_transform = img_transform
@@ -22,6 +22,8 @@ class Sentinel2Dataset:
         self.mask_values_map = kwargs.get('mask_values_map')
         self.masks_dir = Path(kwargs.get(f'{phase}_masks_dir'))
         self.forest_type_path = kwargs.get('forest_type_path')
+
+        self.fill_gap = fill_gap
 
         self.augmentations = [('original', None)]
         if self.enable_augmentation:
@@ -153,6 +155,8 @@ class Sentinel2Dataset:
         with rasterio.open(image_path) as src:
             image = src.read()
             image = self.reorder_select_channels(image, self.current_channels, self.new_channels)
+            if self.fill_gap:
+                image = self.fill_gaps_nearest_neighbor(image)
 
         additional_images = []
         for add_path in additional_image_paths:
@@ -160,6 +164,8 @@ class Sentinel2Dataset:
                 with rasterio.open(add_path) as src:
                     add_image = src.read()
                     add_image = self.reorder_select_channels(add_image, self.current_channels, self.new_channels)
+                    if self.fill_gap:
+                        add_image = self.fill_gaps_nearest_neighbor(add_image)
                     additional_images.append(add_image)
             except:
                 additional_images.append(np.zeros_like(image))
@@ -269,6 +275,42 @@ class Sentinel2Dataset:
         new_indices = [channel_to_index[channel] for channel in new_channels]
         reordered_image = image[new_indices, :, :]
         return reordered_image
+
+
+    def fill_gaps_nearest_neighbor(self, image):
+        """
+        Fill NaN/nodata values in image using nearest neighbor interpolation.
+
+        Args:
+            image: NumPy array of shape (C, H, W)
+
+        Returns:
+            NumPy array with filled gaps
+        """
+        filled_image = image.copy()
+
+        for channel_idx in range(image.shape[0]):
+            channel = filled_image[channel_idx]
+
+            mask = np.isnan(channel) | (channel == 0)
+
+            if np.any(mask):
+                valid_coords = np.argwhere(~mask)
+                invalid_coords = np.argwhere(mask)
+
+                if len(valid_coords) > 0 and len(invalid_coords) > 0:
+                    from scipy.spatial import cKDTree
+
+                    tree = cKDTree(valid_coords)
+                    _, nearest_indices = tree.query(invalid_coords)
+
+                    for i, invalid_coord in enumerate(invalid_coords):
+                        nearest_coord = valid_coords[nearest_indices[i]]
+                        filled_image[channel_idx, invalid_coord[0], invalid_coord[1]] = \
+                            channel[nearest_coord[0], nearest_coord[1]]
+
+        return filled_image
+
 
 class Sentinel2TimeseriesDataset(Dataset):
     def __init__(self, tile_size=224, phase='train', img_transform=None, enable_augmentation=False, mask_transform=None, **kwargs):
