@@ -6,6 +6,7 @@ import rasterio
 import torch.nn.functional as F
 import albumentations as A
 import os
+from typing import List, Optional
 
 
 class Sentinel2Dataset:
@@ -155,8 +156,6 @@ class Sentinel2Dataset:
         with rasterio.open(image_path) as src:
             image = src.read()
             image = self.reorder_select_channels(image, self.current_channels, self.new_channels)
-            if self.fill_gap:
-                image = self.fill_gaps_nearest_neighbor(image)
 
         additional_images = []
         for add_path in additional_image_paths:
@@ -164,12 +163,22 @@ class Sentinel2Dataset:
                 with rasterio.open(add_path) as src:
                     add_image = src.read()
                     add_image = self.reorder_select_channels(add_image, self.current_channels, self.new_channels)
-                    if self.fill_gap:
-                        add_image = self.fill_gaps_nearest_neighbor(add_image)
                     additional_images.append(add_image)
             except:
                 additional_images.append(np.zeros_like(image))
                 print(f"Warning: Could not read additional image at {add_path}")
+
+        if self.fill_gap:
+            all_images = [image] + additional_images
+
+            all_images_filled = self.fill_gaps_temporal_interpolation_optimized(
+                all_images,
+                invalid_value=0.0,
+                use_nan=True
+            )
+
+            image = all_images_filled[0]
+            additional_images = all_images_filled[1:]
 
         with rasterio.open(mask_path) as src:
             mask = src.read(1)
@@ -310,6 +319,75 @@ class Sentinel2Dataset:
                             channel[nearest_coord[0], nearest_coord[1]]
 
         return filled_image
+
+    def fill_gaps_temporal_interpolation_optimized(images: List[np.ndarray],
+                                                   invalid_value: float = 0.0,
+                                                   use_nan: bool = True) -> List[np.ndarray]:
+        """
+        Vectorized version of temporal gap filling for better performance.
+
+        Args:
+            images: List of images, each of shape (C, H, W)
+            invalid_value: Value representing invalid/missing pixels (default: 0.0)
+            use_nan: Whether to also consider NaN as invalid (default: True)
+
+        Returns:
+            List of images with gaps filled using temporal interpolation
+        """
+        if len(images) == 0:
+            return images
+        images_stack = np.stack(images, axis=0)
+        T, C, H, W = images_stack.shape
+        if use_nan:
+            valid_mask = ~(np.isnan(images_stack) | (images_stack == invalid_value))
+        else:
+            valid_mask = (images_stack != invalid_value)
+        filled_stack = images_stack.copy()
+
+        for c in range(C):
+            channel_data = images_stack[:, c, :, :]  # (T, H, W)
+            channel_valid = valid_mask[:, c, :, :]  # (T, H, W)
+            for t in range(T):
+                needs_filling = ~channel_valid[t]
+
+                if not np.any(needs_filling):
+                    continue
+                valid_before_t = None
+                for t_before in range(t - 1, -1, -1):
+                    if np.any(channel_valid[t_before]):
+                        valid_before_t = t_before
+                        break
+                valid_after_t = None
+                for t_after in range(t + 1, T):
+                    if np.any(channel_valid[t_after]):
+                        valid_after_t = t_after
+                        break
+                if valid_before_t is not None and valid_after_t is not None:
+                    t_diff = valid_after_t - valid_before_t
+                    weight_after = (t - valid_before_t) / t_diff
+                    weight_before = 1.0 - weight_after
+
+                    interpolated = (
+                            weight_before * channel_data[valid_before_t] +
+                            weight_after * channel_data[valid_after_t]
+                    )
+
+                    both_valid = channel_valid[valid_before_t] & channel_valid[valid_after_t]
+                    fill_mask = needs_filling & both_valid
+                    filled_stack[t, c][fill_mask] = interpolated[fill_mask]
+
+                elif valid_before_t is not None:
+                    valid_before = channel_valid[valid_before_t]
+                    fill_mask = needs_filling & valid_before
+                    filled_stack[t, c][fill_mask] = channel_data[valid_before_t][fill_mask]
+
+                elif valid_after_t is not None:
+                    valid_after = channel_valid[valid_after_t]
+                    fill_mask = needs_filling & valid_after
+                    filled_stack[t, c][fill_mask] = channel_data[valid_after_t][fill_mask]
+        filled_images = [filled_stack[t] for t in range(T)]
+
+        return filled_images
 
 
 class Sentinel2TimeseriesDataset(Dataset):
