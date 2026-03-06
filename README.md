@@ -385,11 +385,18 @@ Generates:
 If you use this code, please cite:
 
 ```bibtex
-@article{papername2025ulisse,
-  title={ULISSE: Parameter-Efficient Adaptation of Earth Vision Models to Monitor Forest Disturbance in Sentinel-2 Timeseries},
-  author={...},
-  journal={...},
-  year={2026}
+@article{recchia2026ulisse,
+  title={ULISSE: Parameter-efficient adaptation of earth vision models to monitor forest disturbance in sentinel-2 time series},
+  author={Recchia, Vito and Andresini, Giuseppina and Appice, Annalisa and Ienco, Dino and Fiameni, Giuseppe and Malerba, Donato},
+  journal={Ecological Informatics},
+  volume={94},
+  pages={103668},
+  year={2026},
+  month={March},
+  publisher={Elsevier},
+  doi={10.1016/j.ecoinf.2026.103668},
+  url={https://doi.org/10.1016/j.ecoinf.2026.103668},
+  note={Open access under Creative Commons license}
 }
 ```
 
