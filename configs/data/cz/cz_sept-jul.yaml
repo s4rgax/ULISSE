@@ -1,0 +1,30 @@
+base_dir: "data/cz"
+
+dataset_tag: "median_cz"
+execution_tag: "sept-jul"
+
+train_images_subdir: "median/2020-09-01 - 2020-09-30/sentinel_2"
+test_images_subdir: "median/2020-09-01 - 2020-09-30/sentinel_2"
+
+additional_images_dirs:
+  train:
+    - "median/2020-08-01 - 2020-08-31/sentinel_2"
+    - "median/2020-07-01 - 2020-07-31/sentinel_2"
+  test:
+    - "median/2020-08-01 - 2020-08-31/sentinel_2"
+    - "median/2020-07-01 - 2020-07-31/sentinel_2"
+
+train_masks_subdir: "masks/train"
+test_masks_subdir: "masks/test"
+mask_values_map:
+  - 1
+
+
+forest_type_path: "label_forest_2022"
+
+remove_forest_type_on_test: false
+val_split: 0.2
+augmentation: false
+# attivare solo uno
+norm: false
+div_10k: true
