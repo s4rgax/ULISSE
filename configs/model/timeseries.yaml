@@ -1,0 +1,45 @@
+execution:
+  phases:
+    train: true
+    test: true
+    explain: true
+
+training:
+  num_trials: 30
+  max_epochs: 200
+  rank:
+    - 2
+    - 4
+    - 8
+    - 16
+    - 32
+    - 64
+  batch_size:
+    - 4
+    - 8
+    - 16
+    - 32
+    - 64
+  early_stopping_patience: 20
+  optimization_metric: "f1_class1" # "f1_class1" - "loss"
+  num_workers_dl: 8
+  output_dir: "opt_by_f1_div_10k_optimized/timeseries"
+  device: "cuda"
+  tile_size: 224
+
+  peft_encoder: false
+  fusion_mode: middle
+  fusion_technique: concat
+
+  mode: "segmentation" # "segmentation"
+  temporal_mode: "timeseries" # "single" - "timeseries"
+
+  sfreeze_encoder_after: 200
+  freeze_encoder: false
+
+models:
+  resnet50:
+    name: "BIFOLD-BigEarthNetv2-0/resnet50-s2-v0.2.0"
+    sfreeze_encoder_after: 10
+    encoder_type: "resnet"
+    tile_size: 224
