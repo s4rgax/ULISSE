@@ -130,8 +130,6 @@ class UNetTrainer:
                 num_additional_images=self.num_additional_images,
                 fusion_mode=self.fusion_mode,
                 fusion_technique=self.fusion_technique,
-                # TODO RICORDATI DI DISATTIVATE
-                random_init=True
             )
         elif self.temporal_mode == TemporalMode.SINGLE.value:
             self.model = ResNetUNet.from_pretrained(
